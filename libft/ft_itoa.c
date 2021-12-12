@@ -49,7 +49,7 @@ static void	fill_array(char *array, int n, int len)
 	}
 }
 
-char	*ft_itoa(int n)
+char	*ft_itoa(long n)
 {
 	char	*array;
 	int		len;
