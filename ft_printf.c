@@ -103,7 +103,10 @@ char	*itoa(long n)
 	return (array);
 }
 
-
+char	*final_precision(char *str, int precision)
+{
+	return ft_substr(str,ft_strlen(str)-8,8);
+}
 
 int		is_flag(char c){
 	if(
@@ -318,6 +321,53 @@ char * hexa_converter(void *p, int is_upper) {
     return buf;
 }
 
+char * short_hexa_converter(void *p, int is_upper) {
+    unsigned long x = (unsigned long)p;
+    char *buf = malloc(1);
+    char *hexa_base;
+	buf[0]='\0';
+    size_t i;
+	i = 0;
+	if(!is_upper)
+		hexa_base = ft_strdup("0123456789abcdef");
+	else
+		hexa_base = ft_strdup("0123456789ABCDEF");
+
+	while (i < sizeof(x) * 2)
+	{
+		if((hexa_base[(x >> ((sizeof(x) * 2 - 1 - i) * 4)) & 0xf] != '0' && i>=8) || i == 15)
+		{
+			while (i < sizeof(x) * 2)
+			{
+				ft_strlcat(buf, &hexa_base[(x >> ((sizeof(x) * 2 - 1 - i) * 4)) & 0xf],strlen(buf)+2);
+				i++;
+			}
+		}
+		i++;
+	}
+    return buf;
+}
+char *for_hash_flag(char* str, int specifier)
+{
+	if(!specifier)
+		return(ft_strjoin("0x",str));
+	else
+		return(ft_strjoin("0X",str));	
+	return NULL;	
+}
+// char *for_width(char *str, int width, int is_zero)
+// {
+// 	char *output;
+// 	output = str;
+// 	if(is_zero)
+// 		while ((int)ft_strlen(output) < width)
+// 			output = ft_strjoin("0",output);
+// 	if(!is_zero)
+// 		while ((int)ft_strlen(output) < width)
+// 			output = ft_strjoin(" ",output);
+
+// 	return (output);
+// }
 
 
 char *for_d_specifier(void* number_in_hexa, int width, char *flags, int is_long)
@@ -330,19 +380,35 @@ char *for_d_specifier(void* number_in_hexa, int width, char *flags, int is_long)
 	else
 		num = (int)number_in_hexa;
 	output = ft_strdup(itoa(num));
-	if(flags && ft_strchr(flags, '+') && num>=0)
+	if(num<0)
+		output = ft_substr(output,1,ft_strlen(output)-1);
+	if(flags && ft_strchr(flags, '0') && !ft_strchr(flags, '-'))
+		while ((int)ft_strlen(output) < width-((flags && ft_strchr(flags, '+') && !is_long  && num>=0) || num<0))
+			output = ft_strjoin("0",output);
+	
+	
+	if(flags && ft_strchr(flags, '+') && num>=0 && !is_long)
 		output = ft_strjoin("+", output);
-	while ((int)ft_strlen(output) < width)
+	if(flags && ft_strchr(flags, '-'))
+		while ((int)ft_strlen(output) < width)
+		{
+			output = ft_strjoin(output," ");
+		}
+	
+	while ((int)ft_strlen(output) < width && !ft_strchr(flags, '0') && !ft_strchr(flags, '-'))
 	{
 		output = ft_strjoin(" ",output);
 	}
+	if(num < 0)
+		output = ft_strjoin("-",output);
+
 	return output;
 }
 char *for_s_specifier(void* str, int width, int presision)
 {
 	char *output;
 	output = str;
-	while ((int)ft_strlen(output) < width && !presision)
+	while (str && (int)ft_strlen(output) < width && !presision)
 	{
 		output = ft_strjoin(" ",output);
 	}
@@ -374,15 +440,24 @@ char *for_p_specifier(void* p, int width)
 char *for_xX_specifier(void* number_in_hexa, int width, char *flags, int is_Upper)
 {
 	char *output;
-	flags = NULL;
-	output = hexa_converter(number_in_hexa, is_Upper);
 
-	while ((int)ft_strlen(output) < width)
+	output = short_hexa_converter(number_in_hexa, is_Upper);
+	//output = final_precision(output,8);
+	if(flags && ft_strchr(flags, '0'))
+		while ((int)ft_strlen(output) < width-((number_in_hexa && flags && ft_strchr(flags, '#'))*2))
+			output = ft_strjoin("0",output);
+	if(number_in_hexa && flags && ft_strchr(flags, '#'))
 	{
-		output = ft_strjoin(" ",output);
+		output = for_hash_flag(output, is_Upper);
 	}
+	if(flags && !ft_strchr(flags, '0'))
+		while ((int)ft_strlen(output) < width)
+			output = ft_strjoin(" ",output);
+	//output = for_width(output,width,flags && ft_strchr(flags, '0'));
 	return (output);
 }
+
+
 void fill_final_value(Node *node)
 {
 	if(node->data->specifier == 's')
@@ -401,7 +476,8 @@ char *add_it_to_last_string(char *last_string, char *adding,int position)
 {
 	char* output;
 
-
+	if(!adding)
+		adding = ft_strdup("(null)");
 	output = malloc(ft_strlen(last_string)+ft_strlen(adding) + 1);
 	ft_strlcpy(output,last_string,position+1);
 	ft_strlcat(output,adding,ft_strlen(output)+ft_strlen(adding)+1);
@@ -449,7 +525,8 @@ int main()
 	//write_ptr("void *p");
 	char *a = (char *)malloc(2 * Gb * sizeof(char));
 
-	ft_printf("%x ", a);
+	ft_printf("%#+04d|\n", 1);
+	printf("%#+04d|", 1);
 	// ft_printf("%d ",4294967295);
 	// ft_printf("%u ",4294967295);
 	// ft_printf("%u ",4294967295);
