@@ -536,6 +536,7 @@ char *for_hash_flag(char* str, int specifier)
 }
 
 
+
 char *for_d_specifier(void* number_in_hexa, int width, char *flags, int precision, int is_long)
 {
 	char *output;
@@ -545,29 +546,30 @@ char *for_d_specifier(void* number_in_hexa, int width, char *flags, int precisio
 		num = (unsigned int)number_in_hexa;
 	else
 		num = (int)number_in_hexa;
-	output = ft_strdup(itoa(num));
+	if(num==0 && flags  && ft_strchr(flags, '.'))
+		output = ft_strdup("");
+	else
+		output = ft_strdup(itoa(num));
 	if(num<0)
 		output = ft_substr(output,1,ft_strlen(output)-1);
-	if(flags && (ft_strchr(flags, '0') || ft_strchr(flags, '.')) && !ft_strchr(flags, '-'))
-		while (((int)ft_strlen(output) < width-((flags && ft_strchr(flags, '+') && !is_long  && num>=0) || num<0))
-			|| ((int)ft_strlen(output) < precision)
-		 )
+		
+	while ((int)ft_strlen(output) < precision && ft_strchr(flags, '.'))
+		output = ft_strjoin("0",output);
+	if(flags && ft_strchr(flags, '0') && !ft_strchr(flags, '.'))
+		while ((int)ft_strlen(output) < width-((ft_strchr(flags, '+') && !is_long  && num>=0) || num<0))
 			output = ft_strjoin("0",output);
+
+
 	if(num < 0)
 		output = ft_strjoin("-",output);
-	
 	if(flags && ft_strchr(flags, '+') && num>=0 && !is_long)
 		output = ft_strjoin("+", output);
+
 	if(flags && ft_strchr(flags, '-'))
-		while ((int)ft_strlen(output) < width-(num<0))
-		{
+		while ((int)ft_strlen(output) < width)
 			output = ft_strjoin(output," ");
-		}
-	
-	while ((int)ft_strlen(output) < width && ((flags && !ft_strchr(flags, '0') && !ft_strchr(flags, '-')) || !flags))
-	{
+	while ((int)ft_strlen(output) < width)
 		output = ft_strjoin(" ",output);
-	}
 
 
 	return output;
@@ -811,12 +813,86 @@ int		ft_printf(const char *str, ...)
 // 	printf("%-7.5s|\n", "tubular");
 // }
 
-int main()
-{
-	ft_printf("%8.5d|\n", 34);
-	printf("%8.5d|\n", 34);
-	ft_printf("%10.5d|\n", -216);
-	printf("%10.5d|\n", -216);
-	ft_printf("%8.5d|\n", 0);
-	printf("%8.5d|\n", 0);
-}
+// int main()
+// {
+// 	ft_printf("%8.5d|\n", 34);
+// 	printf("%8.5d|\n", 34);
+// 	ft_printf("%10.5d|\n", -216);
+// 	printf("%10.5d|\n", -216);
+// 	ft_printf("%8.5d|\n", 0);
+// 	printf("%8.5d|\n", 0);
+// 	ft_printf("%-7i!\n", -33);
+// 	printf("%-7i!\n", -33);
+// 	ft_printf("%-3i!\n", -0);
+// 	printf("%-3i!\n", -0);
+// 	printf("-------------------------------\n");
+
+
+// 	ft_printf("%.5i\n", 2);
+// 	printf("%.5i\n", 2);
+// 	ft_printf("%.6i\n", -3);
+// 	printf("%.6i\n", -3);
+// 	ft_printf("%.3i\n", 0);
+// 	printf("%.3i\n", 0);
+
+// 	ft_printf("%3.7i\n", 3267);
+// 	printf("%3.7i\n", 3267);
+// 	ft_printf("%3.7i\n", -2375);
+// 	printf("%3.7i\n", -2375);
+
+// 	printf("-------------------------------\n");
+	
+// 	ft_printf("%05i\n", 43);
+// 	printf("%05i\n", 43);
+// 	ft_printf("%07i\n", -54);
+// 	printf("%07i\n", -54);
+// 	ft_printf("%03i\n", 0);
+// 	printf("%03i\n", 0);
+	
+// 	ft_printf("%-8.5i\n", 34);
+// 	printf("%-8.5i\n", 34);
+	
+// 	ft_printf("%-10.5i\n", -216);
+// 	printf("%-10.5i\n", -216);
+	
+// 	ft_printf("%-8.5i\n", 0);
+// 	printf("%-8.5i\n", 0);
+	
+// 	ft_printf("%-3.7i\n", 3267);
+// 	printf("%-3.7i\n", 3267);
+	
+// 	ft_printf("%-3.7i\n", -2375);
+// 	printf("%-3.7i\n", -2375);
+	
+// 	ft_printf("%08.5i\n", 34);
+// 	printf("%08.5i\n", 34);
+	
+// 	ft_printf("%010.5i\n", -216);
+// 	printf("%010.5i\n", -216);
+
+// 	printf("======\n");
+// 	ft_printf("%.0i|\n", 0);
+// 	printf("%.0i|\n", 0);
+// 	ft_printf("%.i|\n", 0);
+// 	printf("%.i|\n", 0);
+// 	ft_printf("%5.0i|\n", 0);
+// 	printf("%5.0i|\n", 0);
+// 	ft_printf("%5.i|\n", 0);
+// 	printf("%5.i|\n", 0);
+// 	ft_printf("%-5.0i|\n", 0);
+// 	printf("%-5.0i|\n", 0);
+// 	ft_printf("%-5.i|\n", 0);
+// 	printf("%-5.i|\n", 0);
+// 	ft_printf("%.0d|\n", 0);
+// 	printf("%.0d|\n", 0);
+// 	ft_printf("%.d|\n", 0);
+// 	printf("%.d|\n", 0);
+// 	ft_printf("%5.0d|\n", 0);
+// 	printf("%5.0d|\n", 0);
+// 	ft_printf("%5.d|\n", 0);
+// 	printf("%5.d|\n", 0);
+// 	ft_printf("%-5.0d|\n", 0);
+// 	printf("%-5.0d|\n", 0);
+// 	ft_printf("%-5.d|\n", 0);
+// 	printf("%-5.d|\n", 0);
+//  }
