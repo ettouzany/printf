@@ -12,7 +12,6 @@
 				"-o",
 				
 				"${fileDirname}/${fileBasenameNoExtension}",
-				"libft.a"
 			],
 			"options": {
 				"cwd": "${fileDirname}"
