@@ -1,370 +1,120 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_printf.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: net-touz <net-touz@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/12/28 14:23:32 by net-touz          #+#    #+#             */
+/*   Updated: 2022/01/02 19:02:20 by net-touz         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stdarg.h>
 #include <stdio.h>
 #include "libft.h"
+#include "ft_printf.h"
 
-enum specifier 
-{   
-	c,
-	s,
-	p,
-	d,
-	i,
-	u,
-	x,
-	X,
-};
-#define ULONG_MAX 0xFFFFFFFFUL
-
-typedef struct Case
+int	is_specifier(char c)
 {
-    char* flags;
-    char specifier;
-    int width;
-	int precision;
-	int position;
-	void* original_value;
-    char* final_value;
-} Case;
-
-typedef struct Node {
-    Case* data;
-    struct Node* next;
-} Node;
-
-size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
-{
-	size_t	src_lenght;
-	size_t	i;
-
-	i = 0;
-	src_lenght = 0;
-	while (src[src_lenght])
-		src_lenght++;
-	if (!dstsize)
-		return (src_lenght);
-	while (i < dstsize - 1 && src[i])
-	{
-		dst[i] = src[i];
-		i++;
-	}
-	if (i < dstsize)
-		dst[i] = '\0';
-	return (src_lenght);
-}
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	i;
-
-	i = 0;
-	if (s == 0)
-		return (0);
-	while (*s++ != '\0')
-		i++;
-	return (i);
-}
-char	*ft_strdup(const char *s1)
-{
-	size_t	i;
-	char	*output;
-
-	i = 0;
-	while (s1[i])
-		i++;
-	output = (char *)malloc(i + 1);
-	if (!output)
-	{
-		return (NULL);
-	}
-	i = 0;
-	while (*s1)
-	{
-		output[i++] = *s1++;
-	}
-	output[i] = '\0';
-	return (output);
-}
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	char	*output;
-	size_t	i;
-	size_t	lenght;
-
-	i = 0;
-	lenght = 0;
-	while (s[lenght])
-		lenght++;
-	if (lenght <= start)
-		i = start;
-	if (lenght >= start)
-		output = malloc(lenght - start + 1);
-	else
-		output = malloc(1);
-	if (!output)
-		return (NULL);
-	i = 0;
-	while (start < lenght && i < len && s[start + i])
-	{
-		output[i] = s[start + i];
-		i++;
-	}
-	output[i] = '\0';
-	return (output);
-}
-
-int	ft_atoi(const char *str)
-{
-	int	out;
-	int	sign;
-
-	out = 0;
-	sign = 1;
-	while ((*str >= 9 && *str <= 13) || *str == 32)
-		str++;
-	if (*str == '-' || *str == '+')
-	{
-		if (*str == '-')
-			sign = -1;
-		str++;
-	}
-	while (*str >= '0' && *str <= '9')
-		out = out * 10 + *str++ - '0';
-	return (sign * out);
-}
-size_t	ft_strlcat(char *dest, const char *src, size_t n)
-{
-	char	*s;
-	size_t	slen;
-	size_t	dlen;
-
-	s = (char *)src;
-	slen = ft_strlen(s);
-	dlen = ft_strlen(dest);
-	if (n < dlen)
-		return (slen + n);
-	else
-	{
-		dest = dest + dlen;
-		ft_strlcpy(dest, s, n - dlen);
-		return (slen + dlen);
-	}
-}
-
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	char	*output;
-	size_t	i;
-
-	i = 0;
-	output = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if (!output)
-		return (NULL);
-	while (*s1)
-		output[i++] = *s1++;
-	while (*s2)
-		output[i++] = *s2++;
-	output[i] = '\0';
-	return (output);
-}
-char	*ft_strchr(const char *str, int c)
-{
-	char	*output;
-
-	output = (char *)str;
-	c = (unsigned char)c;
-	if (!c)
-		return (output + ft_strlen(output));
-	while (*output != '\0')
-		if (*output++ == c)
-			return (--output);
-	return (NULL);
-}
-void	ft_putstr_fd(char *s, int fd)
-{
-	size_t	i;
-
-	i = 0;
-	while (s[i])
-		i++;
-	write(fd, s, i);
-}
-
-
-int		is_specifier(char c){
-	if(
-		c == 'c' ||
-		c == 's' ||
-		c == 'p' ||
-		c == 'd' ||
-		c == 'i' ||
-		c == 'u' ||
-		c == 'x' ||
-		c == 'X' ||
-		c == '%' 
-	 )
-	 return (1);
-	 return (0);
-}
-
-//itoa
-static int	count(long nb)
-{
-	long	count;
-
-	count = 0;
-	if (nb < 1)
-	{
-		nb *= -1;
-		count++;
-	}
-	while (nb > 0)
-	{
-		nb /= 10;
-		count++;
-	}
-	return (count);
-}
-//itoa
-static void	fill_array(char *array, long n, int len)
-{
-	long	a;
-
-	a = n;
-	if (n < 0)
-	{
-		n *= -1;
-	}
-	array[len] = '\0';
-	while (len)
-	{
-		array[--len] = (n % 10 + 48);
-		n = n / 10;
-		if (a < 0)
-			array[0] = '-';
-	}
-}
-
-char	*itoa(long n)
-{
-	char	*array;
-	int		len;
-
-	len = count(n);
-	array = NULL;
-	if (n == -2147483648)
-		return (ft_strdup("-2147483648"));
-	if (n == 0)
-		return (ft_strdup("0"));
-	array = malloc(len + 1);
-	if (!array)
-		return (NULL);
-	fill_array(array, n, len);
-	return (array);
+	if (
+		c == 'c'
+		|| c == 's'
+		|| c == 'p'
+		|| c == 'd'
+		|| c == 'i'
+		|| c == 'u'
+		|| c == 'x'
+		|| c == 'X'
+		|| c == '%')
+		return (1);
+	return (0);
 }
 
 char	*final_precision(char *str, int precision)
 {
-	return ft_substr(str,ft_strlen(str)-8,8+precision);
+	return (ft_substr(str, ft_strlen(str) - 8, 8 + precision));
 }
 
-int		is_flag(char c){
-	if(
-		c == '#' ||
-		c == ' ' ||
-		c == '0' ||
-		c == '+' ||
-		c == '-'
-	 )
-	 return (1);
-	 return (0);
+int	is_flag(char c)
+{
+	if (
+		c == '#'
+		|| c == ' '
+		|| c == '0'
+		|| c == '+'
+		|| c == '-'
+	)
+		return (1);
+	return (0);
 }
-char	*my_strjoin(char const *s1, char const *s2, int lenght)
+
+char	*my_strjoin(char *s1, char *s2, int lenght)
 {
 	char	*output;
-	int	i;
-	int	j;
+	int		i;
+	int		j;
 
 	i = 0;
 	j = 0;
-	output = malloc(ft_strlen(s1) + lenght + 1);
+	if(!s1)
+	{
+		s1 = malloc(1);
+		if (!s1)
+			return (NULL);
+		s1[0] = 0;
+	}
+	output = malloc(sizeof(char) * ft_strlen(s1) + lenght + 1);
 	if (!output)
 		return (NULL);
-	while (s1 && *s1)
-		output[i++] = *s1++;
-	while (j<lenght)
+	while (s1[i])
+		output[i] = s1[i++];
+	while (j < lenght)
 	{
 		output[i++] = s2[j++];
 	}
 	output[i] = '\0';
-	return (output);
+	return (free(s1), output);
 }
-char	*join_flags(const char *s, int lenght, char c)
+
+char	*join_flags(char *s, int lenght, char c)
 {
-	char *output;
-	int i = 0;
-	output = (char *)malloc(lenght+2);
-	while (s && i<lenght)
+	char	*output;
+	int		i;
+
+	i = 0;
+	output = (char *)malloc(sizeof(char) * lenght + 2);
+	if(!output)
+		return(NULL);
+	while (s && i < lenght)
 	{
 		output[i] = s[i];
 		i++;
 	}
-	output[i++]= c;
-	output[i]= '\0';
-
-	return(output);
+	output[i++] = c;
+	output[i] = '\0';
+	return (free(s), output);
 }
 
-Case	*create_case_from_string(char *str,int place)
+
+
+t_node		*creat_t_node(t_case *data)
 {
-	Case	*acase;
-	int i = 0;
+	t_node		*new;
 
-	acase = (Case*)malloc(sizeof(Case));
-	acase->position = place;
-	acase->flags = 0;
-	acase->final_value = 0;
-	acase->original_value = 0;
-	acase->specifier = 0;
-	acase->width = 0;
-	acase->precision = 0;
-	while (is_flag(str[i]))
-	{
-		//momory leak
-		acase->flags = join_flags(acase->flags,i,str[i]);
-		i++;
-	}
-	
-	acase->width = ft_atoi(str+i);
-	
-	while (str[i]>='0' && str[i]<='9')
-		i++;
-	if(str[i] == '.')
-	{
-		acase->flags = join_flags(acase->flags,ft_strlen(acase->flags),str[i]);
-		i++;
-		acase->precision = ft_atoi(str+i);
-		while (str[i]>='0' && str[i]<='9')
-			i++;
-	}
-	if(is_specifier(str[i]))
-	acase->specifier = str[i];
-	else return(NULL);
-	return (acase);
-}
-
-Node	*creat_node(Case *data)
-{
-	Node	*new;
-
-	new = malloc(sizeof(Node));
+	new = malloc(sizeof(t_node));
+	if(!new)
+		return NULL;
 	new->data = data;
 	new->next = NULL;
 	return (new);
 }
-Node	*get_node_by_id(Node **lst, int index)
+
+t_node		*get_node_by_id(t_node **lst, int index)
 {
-	int i = 0;
+	int	i;
+
+	i = 0;
 	if ((*lst))
 	{
 		while ((*lst)->next && i != index)
@@ -372,12 +122,12 @@ Node	*get_node_by_id(Node **lst, int index)
 			lst = &(*lst)->next;
 			i++;
 		}
-		return((*lst));
+		return ((*lst));
 	}
 	return (*lst);
 }
 
-void	add_node_back(Node **lst, Node *new)
+void	add_t_node_back(t_node **lst, t_node *new)
 {
 	if ((*lst))
 	{
@@ -391,71 +141,27 @@ void	add_node_back(Node **lst, Node *new)
 		(*lst) = new;
 }
 
-int		add_case(Node* nodes,Case *acase)
-{
-	if(acase)
-	{
-		if(!nodes->data)
-			nodes->data = acase;
-		else
-			add_node_back(&nodes,creat_node(acase));
-		return (1);
-	}
-	return 0;
-}
 
-int		get_number_of_parameters(const char *str, Node* nodes,char **last_sring)
-{
-	int output = 0;
-	char *str_output;
-	str_output = NULL;
-	int i = 0;
-	int j = 0;
-	while (str[i])
-	{
-		if(str[i] == '%')
-		{
-			i++;
-			j=0;
-			if(add_case(nodes,create_case_from_string((char *)(str+i),ft_strlen(str_output))))
-			{
-				while (!is_specifier(str[i]))
-				{
-					i++;
-				}
-				output++;
-				if(str[i])
-					i++;
-			}
-		}
-		else{
-		str_output = my_strjoin(str_output,&str[i],1);
-		i++;
-		}
-		//momory leak
 
-	}
-		*last_sring = str_output;
-	return output;
-}
+
 
 
 char * write_ptr(void *p) {
-    unsigned long x = (unsigned long)p;
-    char *buf;
-    size_t i;
-	buf = malloc(3);
+	unsigned long x = (unsigned long)p;
+	char *buf;
+	size_t i;
+	buf = malloc(sizeof(char) * 3);
 
-    buf[0] = '0';
-    buf[1] = 'x';
-    buf[2] = '\0';
+	buf[0] = '0';
+	buf[1] = 'x';
+	buf[2] = '\0';
 	i =0;
 	while (i < sizeof(x) * 2)
 	{
 		ft_strlcat(buf, &"0123456789abcdef"[(x >> ((sizeof(x) * 2 - 1 - i) * 4)) & 0xf], ft_strlen(buf)+2);
 		i++;
 	}
-    return buf;
+	return buf;
 }
 // char *for_width(char *str, int width, int is_zero)
 // {
@@ -474,11 +180,11 @@ char * write_ptr(void *p) {
 // }
 
 char * hexa_converter(void *p, int is_upper) {
-    unsigned long x = (unsigned long)p;
-    char *buf = malloc(1);
-    char *hexa_base;
+	unsigned long x = (unsigned long)p;
+	char *buf = malloc(sizeof(char) * 1);
+	char *hexa_base;
 	buf[0]='\0';
-    size_t i;
+	size_t i;
 	i = 0;
 	if(!is_upper)
 		hexa_base = ft_strdup("0123456789abcdef");
@@ -497,15 +203,15 @@ char * hexa_converter(void *p, int is_upper) {
 		}
 		i++;
 	}
-    return buf;
+	return buf;
 }
 
 char * short_hexa_converter(void *p, int is_upper,int dakchi_libaghi) {
-    unsigned long x = (unsigned long)p;
-    char *buf = malloc(1);
-    char *hexa_base;
+	unsigned long x = (unsigned long)p;
+	char *buf = malloc(sizeof(char) * 1);
+	char *hexa_base;
 	buf[0]='\0';
-    size_t i;
+	size_t i;
 	i = 0;
 	if(!is_upper)
 		hexa_base = ft_strdup("0123456789abcdef");
@@ -524,7 +230,7 @@ char * short_hexa_converter(void *p, int is_upper,int dakchi_libaghi) {
 		}
 		i++;
 	}
-    return buf;
+	return buf;
 }
 char *for_hash_flag(char* str, int specifier)
 {
@@ -597,7 +303,7 @@ char *for_s_specifier(void* str, char *flags, int width, int presision)
 char *for_c_specifier(void* c, char *flags, int width, int is_precentage)
 {
 	char *output;
-	output = malloc(1);
+	output = malloc(sizeof(char) * 1);
 	if(!output)
 		return NULL;
 	output[0] = (char)c;
@@ -651,20 +357,20 @@ char *for_xX_specifier(void* number_in_hexa, int width, char *flags, int is_Uppe
 	return (output);
 }
 
-#define NDO node->data->original_value 
+#define NDO t_node	->data->original_value 
 
-void fill_final_value(Node *node)
+void fill_final_value(t_node	 *t_node	)
 {
-	if(node->data->specifier == 's')
-		node->data->final_value = for_s_specifier((char *)NDO,node->data->flags, node->data->width,node->data->precision);
-	else if(node->data->specifier == 'd' || node->data->specifier == 'i'  || node->data->specifier == 'u')
-		node->data->final_value = for_d_specifier(NDO, node->data->width, node->data->flags,node->data->precision,node->data->specifier == 'u');
-	else if(node->data->specifier == 'c' || node->data->specifier == '%')
-		node->data->final_value = for_c_specifier(NDO, node->data->flags, node->data->width, node->data->specifier == '%');
-	else if(node->data->specifier == 'p')
-		node->data->final_value = for_p_specifier(NDO,node->data->flags , node->data->width);
-	else if(node->data->specifier == 'x' || node->data->specifier == 'X')
-		node->data->final_value = for_xX_specifier(NDO, node->data->width, node->data->flags,node->data->specifier == 'X');
+	if(t_node	->data->specifier == 's')
+		t_node	->data->final_value = for_s_specifier((char *)NDO,t_node	->data->flags, t_node	->data->width,t_node	->data->precision);
+	else if(t_node	->data->specifier == 'd' || t_node	->data->specifier == 'i'  || t_node	->data->specifier == 'u')
+		t_node	->data->final_value = for_d_specifier(NDO, t_node	->data->width, t_node	->data->flags,t_node	->data->precision,t_node	->data->specifier == 'u');
+	else if(t_node	->data->specifier == 'c' || t_node	->data->specifier == '%')
+		t_node	->data->final_value = for_c_specifier(NDO, t_node	->data->flags, t_node	->data->width, t_node	->data->specifier == '%');
+	else if(t_node	->data->specifier == 'p')
+		t_node	->data->final_value = for_p_specifier(NDO,t_node	->data->flags , t_node	->data->width);
+	else if(t_node	->data->specifier == 'x' || t_node	->data->specifier == 'X')
+		t_node	->data->final_value = for_xX_specifier(NDO, t_node	->data->width, t_node	->data->flags,t_node	->data->specifier == 'X');
 }
 
 char *add_it_to_last_string(char *last_string, char *adding,int position)
@@ -673,26 +379,119 @@ char *add_it_to_last_string(char *last_string, char *adding,int position)
 
 	if(!adding)
 		adding = ft_strdup("(null)");
-	output = malloc(ft_strlen(last_string)+ft_strlen(adding) + 1);
+	output = malloc(sizeof(char) * ft_strlen(last_string)+ft_strlen(adding) + 1);
 	ft_strlcpy(output,last_string,position+1);
 	ft_strlcat(output,adding,ft_strlen(output)+ft_strlen(adding)+1);
 	ft_strlcat(output,last_string+position,ft_strlen(last_string)+ft_strlen(adding)+1);
 	return(output);
 }
 
+//this function will take a string and return a case from it
+// - she will allocate a case and return it
+// - if not free return NULL
+
+//! leaks free
+t_case	*create_case_from_string(char *str, int place)
+{
+	t_case		*acase;
+	int			i;
+
+	i = 0;
+	acase = (t_case *)malloc(sizeof(t_case));
+	acase->position = place;
+	acase->flags = 0;
+	acase->final_value = 0;
+	acase->original_value = 0;
+	acase->specifier = 0;
+	acase->width = 0;
+	acase->precision = 0;
+	while (is_flag(str[i]))
+	{
+		acase->flags = join_flags(acase->flags, i, str[i]);
+		i++;
+	}
+	acase->width = ft_atoi(str + i);
+	while (str[i] >= '0' && str[i] <= '9')
+		i++;
+	if (str[i] == '.')
+	{
+		acase->flags = join_flags(acase->flags, ft_strlen(acase->flags), str[i]);
+		i++;
+		acase->precision = ft_atoi(str + i);
+		while (str[i] >= '0' && str[i] <= '9')
+			i++;
+	}
+	if (is_specifier(str[i]))
+		acase->specifier = str[i];
+	else
+		return (free(acase), NULL);
+	return (acase);
+}
+
+
+int		add_case(t_node	* nodes,t_case	 *acase)
+{
+	if(acase)
+	{
+		if(!nodes->data)
+			nodes->data = acase;
+		else
+			add_t_node_back(&nodes,creat_t_node(acase));
+		return (1);
+	}
+	return 0;
+}
+
+//this func will fill all the data on start: 
+// - last string(striped from cases
+// - create a case if she find one by calling create_case_from_string
+// - return the number of parameters
+int		ft_fill_data(const char *str, t_node *nodes,char **last_sring)
+{
+	int output = 0;
+	char *str_output;
+	str_output = NULL;
+	int i = 0;
+	int j = 0;
+	while (str[i])
+	{
+		if(str[i] == '%')
+		{
+			i++;
+			j=0;
+			if(add_case(nodes,create_case_from_string((char *)(str+i),ft_strlen(str_output))))
+			{
+				while (!is_specifier(str[i]))
+					i++;
+				output++;
+				if(str[i])
+					i++;
+			} else
+			{
+				return (-1);
+			}
+		}
+		else
+			str_output = my_strjoin(str_output, &str[i++],1);
+	}
+	*last_sring = str_output;
+	if(!str_output)
+		return(-1);
+	return (output);
+}
+
 int		ft_printf(const char *str, ...)
 {
-    Node* nodes = NULL;
+	t_node	*nodes;
+	t_node	 *for_storing;
 	char* last_string;
-	last_string = NULL;
-
-    nodes = creat_node(NULL);
 	int number_of_parameters;
+
+	nodes = creat_t_node(NULL);
+	last_string = NULL;
 	int i = 0;
 	int add = 0;
-	Node *for_storing;
-	number_of_parameters = get_number_of_parameters(str, nodes, &last_string);
-	
+	number_of_parameters = ft_fill_data(str, nodes, &last_string);
 	va_list args;
 	va_start(args, str);
 	if(!last_string)
@@ -706,9 +505,6 @@ int		ft_printf(const char *str, ...)
 		add += ft_strlen(for_storing->data->final_value);
 		i++;
 	}
-	
-	//printf("\nnumber of parameters:%d", 2);
-	//int fd = va_arg(args, int);
 	ft_putstr_fd((char *)last_string,1);
 	va_end(args);
 	return (0);
@@ -813,86 +609,88 @@ int		ft_printf(const char *str, ...)
 // 	printf("%-7.5s|\n", "tubular");
 // }
 
-// int main()
-// {
-// 	ft_printf("%8.5d|\n", 34);
-// 	printf("%8.5d|\n", 34);
-// 	ft_printf("%10.5d|\n", -216);
-// 	printf("%10.5d|\n", -216);
-// 	ft_printf("%8.5d|\n", 0);
-// 	printf("%8.5d|\n", 0);
-// 	ft_printf("%-7i!\n", -33);
-// 	printf("%-7i!\n", -33);
-// 	ft_printf("%-3i!\n", -0);
-// 	printf("%-3i!\n", -0);
-// 	printf("-------------------------------\n");
+void	check_leaks();
+int main()
+{
+	ft_printf("%8.5d|\n", 34);
+	printf("%8.5d|\n", 34);
+	ft_printf("%10.5d|\n", -216);
+	printf("%10.5d|\n", -216);
+	ft_printf("%8.5d|\n", 0);
+	printf("%8.5d|\n", 0);
+	ft_printf("%-7i!\n", -33);
+	printf("%-7i!\n", -33);
+	ft_printf("%-3i!\n", -0);
+	printf("%-3i!\n", -0);
+	printf("-------------------------------\n");
 
 
-// 	ft_printf("%.5i\n", 2);
-// 	printf("%.5i\n", 2);
-// 	ft_printf("%.6i\n", -3);
-// 	printf("%.6i\n", -3);
-// 	ft_printf("%.3i\n", 0);
-// 	printf("%.3i\n", 0);
+	ft_printf("%.5i\n", 2);
+	printf("%.5i\n", 2);
+	ft_printf("%.6i\n", -3);
+	printf("%.6i\n", -3);
+	ft_printf("%.3i\n", 0);
+	printf("%.3i\n", 0);
 
-// 	ft_printf("%3.7i\n", 3267);
-// 	printf("%3.7i\n", 3267);
-// 	ft_printf("%3.7i\n", -2375);
-// 	printf("%3.7i\n", -2375);
+	ft_printf("%3.7i\n", 3267);
+	printf("%3.7i\n", 3267);
+	ft_printf("%3.7i\n", -2375);
+	printf("%3.7i\n", -2375);
 
-// 	printf("-------------------------------\n");
+	printf("-------------------------------\n");
 	
-// 	ft_printf("%05i\n", 43);
-// 	printf("%05i\n", 43);
-// 	ft_printf("%07i\n", -54);
-// 	printf("%07i\n", -54);
-// 	ft_printf("%03i\n", 0);
-// 	printf("%03i\n", 0);
+	ft_printf("%05i\n", 43);
+	printf("%05i\n", 43);
+	ft_printf("%07i\n", -54);
+	printf("%07i\n", -54);
+	ft_printf("%03i\n", 0);
+	printf("%03i\n", 0);
 	
-// 	ft_printf("%-8.5i\n", 34);
-// 	printf("%-8.5i\n", 34);
+	ft_printf("%-8.5i\n", 34);
+	printf("%-8.5i\n", 34);
 	
-// 	ft_printf("%-10.5i\n", -216);
-// 	printf("%-10.5i\n", -216);
+	ft_printf("%-10.5i\n", -216);
+	printf("%-10.5i\n", -216);
 	
-// 	ft_printf("%-8.5i\n", 0);
-// 	printf("%-8.5i\n", 0);
+	ft_printf("%-8.5i\n", 0);
+	printf("%-8.5i\n", 0);
 	
-// 	ft_printf("%-3.7i\n", 3267);
-// 	printf("%-3.7i\n", 3267);
+	ft_printf("%-3.7i\n", 3267);
+	printf("%-3.7i\n", 3267);
 	
-// 	ft_printf("%-3.7i\n", -2375);
-// 	printf("%-3.7i\n", -2375);
+	ft_printf("%-3.7i\n", -2375);
+	printf("%-3.7i\n", -2375);
 	
-// 	ft_printf("%08.5i\n", 34);
-// 	printf("%08.5i\n", 34);
+	ft_printf("%08.5i\n", 34);
+	printf("%08.5i\n", 34);
 	
-// 	ft_printf("%010.5i\n", -216);
-// 	printf("%010.5i\n", -216);
+	ft_printf("%010.5i\n", -216);
+	printf("%010.5i\n", -216);
 
-// 	printf("======\n");
-// 	ft_printf("%.0i|\n", 0);
-// 	printf("%.0i|\n", 0);
-// 	ft_printf("%.i|\n", 0);
-// 	printf("%.i|\n", 0);
-// 	ft_printf("%5.0i|\n", 0);
-// 	printf("%5.0i|\n", 0);
-// 	ft_printf("%5.i|\n", 0);
-// 	printf("%5.i|\n", 0);
-// 	ft_printf("%-5.0i|\n", 0);
-// 	printf("%-5.0i|\n", 0);
-// 	ft_printf("%-5.i|\n", 0);
-// 	printf("%-5.i|\n", 0);
-// 	ft_printf("%.0d|\n", 0);
-// 	printf("%.0d|\n", 0);
-// 	ft_printf("%.d|\n", 0);
-// 	printf("%.d|\n", 0);
-// 	ft_printf("%5.0d|\n", 0);
-// 	printf("%5.0d|\n", 0);
-// 	ft_printf("%5.d|\n", 0);
-// 	printf("%5.d|\n", 0);
-// 	ft_printf("%-5.0d|\n", 0);
-// 	printf("%-5.0d|\n", 0);
-// 	ft_printf("%-5.d|\n", 0);
-// 	printf("%-5.d|\n", 0);
-//  }
+	printf("======\n");
+	ft_printf("%.0i|\n", 0);
+	printf("%.0i|\n", 0);
+	ft_printf("%.i|\n", 0);
+	printf("%.i|\n", 0);
+	ft_printf("%5.0i|\n", 0);
+	printf("%5.0i|\n", 0);
+	ft_printf("%5.i|\n", 0);
+	printf("%5.i|\n", 0);
+	ft_printf("%-5.0i|\n", 0);
+	printf("%-5.0i|\n", 0);
+	ft_printf("%-5.i|\n", 0);
+	printf("%-5.i|\n", 0);
+	ft_printf("%.0d|\n", 0);
+	printf("%.0d|\n", 0);
+	ft_printf("%.d|\n", 0);
+	printf("%.d|\n", 0);
+	ft_printf("%5.0d|\n", 0);
+	printf("%5.0d|\n", 0);
+	ft_printf("%5.d|\n", 0);
+	printf("%5.d|\n", 0);
+	ft_printf("%-5.0d|\n", 0);
+	printf("%-5.0d|\n", 0);
+	ft_printf("%-5.d|\n", 0);
+	printf("%-5.d|\n", 0);
+	return (check_leaks(), 0);
+ }
