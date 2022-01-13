@@ -6,229 +6,76 @@
 /*   By: net-touz <net-touz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/29 15:14:35 by net-touz          #+#    #+#             */
-/*   Updated: 2021/12/29 15:41:32 by net-touz         ###   ########.fr       */
+/*   Updated: 2022/01/12 23:33:15 by net-touz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
-{
-	size_t	src_lenght;
-	size_t	i;
+// char	*final_precision(char *str, int precision)
+// {
+// 	return (ft_substr(str, ft_strlen(str) - 8, 8 + precision, 0));
+// }
 
-	i = 0;
-	src_lenght = 0;
-	while (src[src_lenght])
-		src_lenght++;
-	if (!dstsize)
-		return (src_lenght);
-	while (i < dstsize - 1 && src[i])
-	{
-		dst[i] = src[i];
-		i++;
-	}
-	if (i < dstsize)
-		dst[i] = '\0';
-	return (src_lenght);
-}
+// char * write_ptr(void *p) {
+// 	unsigned long x = (unsigned long)p;
+// 	char *buf;
+// 	size_t i;
+// 	buf = malloc(sizeof(char) * 3);
 
-size_t	ft_strlen(const char *s)
-{
-	size_t	i;
+// 	buf[0] = '0';
+// 	buf[1] = 'x';
+// 	buf[2] = '\0';
+// 	i =0;
+// 	while (i < sizeof(x) * 2)
+// 	{
+// 		ft_strlcat(buf, &"0123456789abcdef"
+// [(x >> ((sizeof(x) * 2 - 1 - i) * 4)) & 0xf], ft_strlen(buf)+2);
+// 		i++;
+// 	}
+// 	return buf;
+// }
 
-	i = 0;
-	if (s == 0)
-		return (0);
-	while (*s++ != '\0')
-		i++;
-	return (i);
-}
+// char *for_width(char *str, int width, int is_zero)
+// {
+// 	char *output;
+// 	output = str;
+// 	if(is_zero)
+// 		while ((int)ft_strlen(output) < width)
+// 			output = ft_strjoin("0",output);
+// 	if(!is_zero)
+// 		while ((int)ft_strlen(output) < width)
+// 			output = ft_strjoin(" ",output);
+// 	return (output);
+// }
+// char *handel_width(char* str, )
+// {
+// }
 
-char	*ft_strdup(const char *s1)
-{
-	size_t	i;
-	char	*output;
+// char * hexa_converter(void *p, int is_upper) {
+// 	unsigned long x = (unsigned long)p;
+// 	char *buf = malloc(sizeof(char) * 1);
+// 	char *hexa_base;
+// 	buf[0]='\0';
+// 	size_t i;
+// 	i = 0;
+// 	if(!is_upper)
+// 		hexa_base = ft_strdup("0123456789abcdef",0);
+// 	else
+// 		hexa_base = ft_strdup("0123456789ABCDEF",0);
 
-	i = 0;
-	while (s1[i])
-		i++;
-	output = (char *)malloc(i + 1);
-	if (!output)
-	{
-		return (NULL);
-	}
-	i = 0;
-	while (*s1)
-	{
-		output[i++] = *s1++;
-	}
-	output[i] = '\0';
-	return (output);
-}
-
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	char	*output;
-	size_t	i;
-	size_t	lenght;
-
-	i = 0;
-	lenght = 0;
-	while (s[lenght])
-		lenght++;
-	if (lenght <= start)
-		i = start;
-	if (lenght >= start)
-		output = malloc(lenght - start + 1);
-	else
-		output = malloc(1);
-	if (!output)
-		return (NULL);
-	i = 0;
-	while (start < lenght && i < len && s[start + i])
-	{
-		output[i] = s[start + i];
-		i++;
-	}
-	output[i] = '\0';
-	return (output);
-}
-
-int	ft_atoi(const char *str)
-{
-	int	out;
-	int	sign;
-
-	out = 0;
-	sign = 1;
-	while ((*str >= 9 && *str <= 13) || *str == 32)
-		str++;
-	if (*str == '-' || *str == '+')
-	{
-		if (*str == '-')
-			sign = -1;
-		str++;
-	}
-	while (*str >= '0' && *str <= '9')
-		out = out * 10 + *str++ - '0';
-	return (sign * out);
-}
-
-size_t	ft_strlcat(char *dest, const char *src, size_t n)
-{
-	char	*s;
-	size_t	slen;
-	size_t	dlen;
-
-	s = (char *)src;
-	slen = ft_strlen(s);
-	dlen = ft_strlen(dest);
-	if (n < dlen)
-		return (slen + n);
-	else
-	{
-		dest = dest + dlen;
-		ft_strlcpy(dest, s, n - dlen);
-		return (slen + dlen);
-	}
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	char	*output;
-	size_t	i;
-
-	i = 0;
-	output = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if (!output)
-		return (NULL);
-	while (*s1)
-		output[i++] = *s1++;
-	while (*s2)
-		output[i++] = *s2++;
-	output[i] = '\0';
-	return (output);
-}
-
-char	*ft_strchr(const char *str, int c)
-{
-	char	*output;
-
-	output = (char *)str;
-	c = (unsigned char)c;
-	if (!c)
-		return (output + ft_strlen(output));
-	while (*output != '\0')
-		if (*output++ == c)
-			return (--output);
-	return (NULL);
-}
-
-void	ft_putstr_fd(char *s, int fd)
-{
-	size_t	i;
-
-	i = 0;
-	while (s[i])
-		i++;
-	write(fd, s, i);
-}
-
-
-//itoa
-static int	count(long nb)
-{
-	long	count;
-
-	count = 0;
-	if (nb < 1)
-	{
-		nb *= -1;
-		count++;
-	}
-	while (nb > 0)
-	{
-		nb /= 10;
-		count++;
-	}
-	return (count);
-}
-
-//itoa
-static void	fill_array(char *array, long n, int len)
-{
-	long	a;
-
-	a = n;
-	if (n < 0)
-	{
-		n *= -1;
-	}
-	array[len] = '\0';
-	while (len)
-	{
-		array[--len] = (n % 10 + 48);
-		n = n / 10;
-		if (a < 0)
-			array[0] = '-';
-	}
-}
-
-char	*itoa(long n)
-{
-	char	*array;
-	int		len;
-
-	len = count(n);
-	array = NULL;
-	if (n == -2147483648)
-		return (ft_strdup("-2147483648"));
-	if (n == 0)
-		return (ft_strdup("0"));
-	array = malloc(len + 1);
-	if (!array)
-		return (NULL);
-	fill_array(array, n, len);
-	return (array);
-}
+// 	while (i < sizeof(x) * 2)
+// 	{
+// 		if(hexa_base[(x >> ((sizeof(x) * 2 - 1 - i) * 4)) & 0xf] != '0')
+// 		{
+// 			while (i < sizeof(x) * 2)
+// 			{
+// 				ft_strlcat(buf, &hexa_base[(x >> ((sizeof(x) * 2 - 1 - i) * 4)) 
+//                  & 0xf],strlen(buf)+2);
+// 				i++;
+// 			}
+// 		}
+// 		i++;
+// 	}
+// 	return buf;
+// }
