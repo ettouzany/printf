@@ -6,38 +6,38 @@
 /*   By: net-touz <net-touz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/11 21:02:27 by net-touz          #+#    #+#             */
-/*   Updated: 2022/01/13 01:22:16 by net-touz         ###   ########.fr       */
+/*   Updated: 2022/01/13 23:03:51 by net-touz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../ft_printf.h"
-//! leaks free
+#include "../ft_printf_outils.h"
 
-char	*ft_d_specifier(void *number_in_hexa, int width, char *f, int p, int l)
+//! leaks free
+char	*ft_d_specifier(t_case *acas)
 {
 	char	*output;
 	long	num;
 
-	if (l)
-		num = (unsigned int)number_in_hexa;
+	if (acas->specifier == 'u')
+		num = (unsigned int)acas->o_value;
 	else
-		num = (int)number_in_hexa;
-	if (num == 0 && f && ft_strchr(f, '.'))
+		num = (int)acas->o_value;
+	if (num == 0 && acas->flags && ft_strchr(acas->flags, '.'))
 		output = ft_strdup("", 0);
 	else
 		output = ft_strdup(ft_itoa(num), 1);
 	if (num < 0)
 		output = ft_substr(output, 1, ft_strlen(output) - 1, 1);
-	while ((int)ft_strlen(output) < p && ft_strchr(f, '.'))
+	while (ft_strlen(output) < acas->precision && ft_strchr(acas->flags, '.'))
 		output = ft_strjoin("0", output, 2);
-	if (ft_strchr(f, '0') && !ft_strchr(f, '.'))
-		while ((int)ft_strlen(output) < width - ((ft_strchr(f, '+')
-					&& !l && num >= 0) || num < 0))
+	if (ft_strchr(acas->flags, '0') && !ft_strchr(acas->flags, '.'))
+		while (ft_strlen(output) < acas->width - ((ft_strchr(acas->flags, '+')
+					&& !(acas->specifier == 'u') && num >= 0) || num < 0))
 			output = ft_strjoin("0", output, 2);
 	if (num < 0)
 		output = ft_strjoin("-", output, 2);
-	if (ft_strchr(f, '+') && num >= 0 && !l)
+	if (ft_strchr(acas->flags, '+') && num >= 0 && !(acas->specifier == 'u'))
 		output = ft_strjoin("+", output, 2);
-	output = ft_fill_flags_width(output, width, (int)ft_strchr(f, '-'), 0);
+	output = ft_fill(output, acas->width, (int)ft_strchr(acas->flags, '-'), 0);
 	return (output);
 }

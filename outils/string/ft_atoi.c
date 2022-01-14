@@ -6,11 +6,11 @@
 /*   By: net-touz <net-touz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/11 21:59:36 by net-touz          #+#    #+#             */
-/*   Updated: 2022/01/12 21:54:04 by net-touz         ###   ########.fr       */
+/*   Updated: 2022/01/13 20:33:08 by net-touz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../ft_printf.h"
+#include "../ft_printf_outils.h"
 
 int	ft_atoi(const char *str)
 {

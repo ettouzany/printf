@@ -2,6 +2,7 @@
     "files.associations": {
         "ft_printf.h": "c",
         "stdlib.h": "c",
-        "ft_printf_outils.h": "c"
+        "ft_printf_outils.h": "c",
+        "unistd.h": "c"
     }
 }

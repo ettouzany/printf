@@ -6,11 +6,11 @@
 /*   By: net-touz <net-touz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/11 21:56:27 by net-touz          #+#    #+#             */
-/*   Updated: 2022/01/12 20:45:31 by net-touz         ###   ########.fr       */
+/*   Updated: 2022/01/13 20:33:08 by net-touz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../ft_printf.h"
+#include "../ft_printf_outils.h"
 
 size_t	ft_strlcat(char *dest, const char *src, size_t n)
 {

@@ -6,11 +6,11 @@
 /*   By: net-touz <net-touz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/11 21:57:11 by net-touz          #+#    #+#             */
-/*   Updated: 2022/01/13 01:13:25 by net-touz         ###   ########.fr       */
+/*   Updated: 2022/01/13 20:33:08 by net-touz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../ft_printf.h"
+#include "../ft_printf_outils.h"
 
 //itoa
 static int	count(long nb)

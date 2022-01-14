@@ -6,11 +6,11 @@
 /*   By: net-touz <net-touz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/12 20:41:34 by net-touz          #+#    #+#             */
-/*   Updated: 2022/01/13 01:09:43 by net-touz         ###   ########.fr       */
+/*   Updated: 2022/01/13 20:33:08 by net-touz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../ft_printf.h"
+#include "../ft_printf_outils.h"
 
 char	*ft_strjoin(char *s1, char *s2, int fre)
 {
