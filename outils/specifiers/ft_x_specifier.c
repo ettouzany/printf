@@ -12,25 +12,16 @@
 
 #include "../ft_printf_outils.h"
 
-char	*ft_x_specifier(void *number_in_hexa, int width, char *flags, int upr)
+char	*ft_x_specifier(t_case *acase)
 {
 	char	*output;
 
-	output = ft_short_hexa_converter(number_in_hexa, upr, 8);
-	if (ft_strchr(flags, '0'))
-		while ((int)ft_strlen(output) < width - ((number_in_hexa
-					&& flags && ft_strchr(flags, '#')) * 2))
-			output = ft_strjoin("0", output, 2);
-	if (number_in_hexa && flags && ft_strchr(flags, '#'))
-	{
-		output = ft_for_hash_flag(output, upr);
-	}
-	if ((flags && !ft_strchr(flags, '0') && !ft_strchr(flags, '-')) || !flags)
-		while ((int)ft_strlen(output) < width - ((number_in_hexa
-					&& flags && ft_strchr(flags, '#')) * 2))
-			output = ft_strjoin(" ", output, 2);
-	while ((int)ft_strlen(output) < width - ((number_in_hexa
-				&& flags && ft_strchr(flags, '#')) * 2))
-			output = ft_strjoin(output, " ", 1);
+	output = ft_short_hexa_converter(acase->o_value,
+			acase->specifier == 'X', 8);
+	if (output[0] == '0' && (ft_strchr(acase->flags, '0')
+			|| ft_strchr(acase->flags, '.')) && acase->width == 0)
+		output = (free(output), ft_strdup("", 0));
+	output = ft_fill(output, acase->width, (int)ft_strchr(acase->flags, '-'),
+			(int)ft_strchr(acase->flags, '0'));
 	return (output);
 }

@@ -30,6 +30,6 @@ void	ft_lstiter(t_node *lst, void (*f)(void *))
 		}
 		f(lst->data->flags);
 		f(lst->data->final_value);
-		f(lst);
+		//f(lst);
 	}
 }

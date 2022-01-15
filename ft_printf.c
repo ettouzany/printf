@@ -18,6 +18,7 @@ int	ft_printf(const char *str, ...)
 	char	*last_string;
 	int		number_of_parameters;
 	va_list	args;
+	int		rtrn;
 
 	nodes = ((last_string = NULL), ft_creat_node(NULL));
 	number_of_parameters = ft_fill_data(str, nodes, &last_string);
@@ -28,9 +29,10 @@ int	ft_printf(const char *str, ...)
 		last_string = ft_strdup("", 0);
 	ft_fill_params(number_of_parameters, &nodes, &last_string, args);
 	ft_putstr((char *)last_string);
-	free(last_string);
 	if (number_of_parameters)
 		ft_lstiter(nodes, free);
 	free(nodes);
-	return (va_end(args), 0);
+	rtrn = ft_strlen(last_string);
+	free(last_string);
+	return (va_end(args), rtrn);
 }

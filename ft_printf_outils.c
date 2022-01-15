@@ -25,9 +25,7 @@ void	fill_final_value(t_node *node)
 		node->data->final_value = ft_p_specifier(node->data->o_value,
 				node->data->flags, node->data->width);
 	else if (node->data->specifier == 'x' || node->data->specifier == 'X')
-		node->data->final_value = ft_x_specifier(node->data->o_value,
-				node->data->width, node->data->flags,
-				node->data->specifier == 'X');
+		node->data->final_value = ft_x_specifier(node->data);
 }
 
 char	*add_it_to_last_string(char *last_string, char *adding, int position)
@@ -88,15 +86,17 @@ int	ft_fill_data(const char *str, t_node *nodes, char **last_sring)
 	int		output;
 	char	*str_output;
 	int		i;
+	int		ok;
 
-	output = ((str_output = NULL), i = 0, 0);
+	output = ((str_output = NULL), i = 0, ok = 1, 0);
 	while (str[i])
 	{
 		if (str[i] == '%')
 		{
-			ft_add_case(nodes, create_case_from_string((char *)(str + ++i),
-					ft_strlen(str_output)));
-			while (!is_specifier(str[i]))
+			if (!ft_add_case(nodes, create_case_from_string((char *)(str + ++i),
+					ft_strlen(str_output))))
+				return (free(str_output), -1);
+			while (!is_specifier(str[i]) && str[i])
 				i++;
 			output++;
 			i += !!str[i];
@@ -105,8 +105,6 @@ int	ft_fill_data(const char *str, t_node *nodes, char **last_sring)
 			str_output = ft_strjoinl(str_output, (char *) &str[i++], 1, 1);
 	}
 	*last_sring = str_output;
-	if (!str_output)
-		return (-1);
 	return (output);
 }
 

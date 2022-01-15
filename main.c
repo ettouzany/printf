@@ -16,7 +16,11 @@ void	check_leaks(void);
 
 int	main(void)
 {
-	ft_printf("sasa\n");
-	printf("sasa\n");
-	return (check_leaks(), 0);
+int t;
+	char c;
+
+	c = 'a';
+	t = 50;
+	ft_printf("%d", ft_printf(" xzcxzcxzc%", &t,0  ),0  );
+	return (check_leaks(),0);
 }

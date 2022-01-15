@@ -45,7 +45,7 @@ char	*ft_c_specifier(t_case *acase);
 char	*ft_d_specifier(t_case *acase);
 char	*ft_p_specifier(void *p, char *flags, int width);
 char	*ft_s_specifier(t_case *acase);
-char	*ft_x_specifier(void *number_in_hexa, int width, char *flags, int upr);
+char	*ft_x_specifier(t_case *acase);
 
 void	ft_lstiter(t_node *lst, void (*f)(void *));
 t_node	*ft_get_node_by_id(t_node **lst, int index);

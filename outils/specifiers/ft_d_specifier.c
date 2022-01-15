@@ -12,16 +12,21 @@
 
 #include "../ft_printf_outils.h"
 
+long	ft_unsined(void *p, int s)
+{
+	if (s)
+		return ((unsigned int)p);
+	else
+		return ((int)p);
+}
+
 //! leaks free
 char	*ft_d_specifier(t_case *acas)
 {
 	char	*output;
 	long	num;
 
-	if (acas->specifier == 'u')
-		num = (unsigned int)acas->o_value;
-	else
-		num = (int)acas->o_value;
+	num = ft_unsined(acas->o_value, acas->specifier == 'u');
 	if (num == 0 && acas->flags && ft_strchr(acas->flags, '.'))
 		output = ft_strdup("", 0);
 	else
@@ -38,6 +43,9 @@ char	*ft_d_specifier(t_case *acas)
 		output = ft_strjoin("-", output, 2);
 	if (ft_strchr(acas->flags, '+') && num >= 0 && !(acas->specifier == 'u'))
 		output = ft_strjoin("+", output, 2);
+	if (ft_strchr(acas->flags, ' ') && !ft_strchr(acas->flags, '+')
+		&& num >= 0 && !(acas->specifier == 'u'))
+		output = ft_strjoin(" ", output, 2);
 	output = ft_fill(output, acas->width, (int)ft_strchr(acas->flags, '-'), 0);
 	return (output);
 }
