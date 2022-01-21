@@ -23,7 +23,7 @@ char	*ft_c_specifier(t_case *acase)
 	output[1] = '\0';
 	if (acase->specifier == '%')
 		output[0] = '%';
-	output = ft_fill(output, acase->width,
+	output = ft_fill(output, acase->width - !output[0],
 			(int)ft_strchr(acase->flags, '-'),
 			(int)ft_strchr(acase->flags, '0'));
 	return (output);

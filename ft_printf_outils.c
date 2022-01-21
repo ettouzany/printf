@@ -28,19 +28,22 @@ void	fill_final_value(t_node *node)
 		node->data->final_value = ft_x_specifier(node->data);
 }
 
-char	*add_it_to_last_string(char *last_string, char *adding, int position)
+int	add_it_to_last_string(char **last_string, char *adding, int pos, int isc)
 {
 	char	*output;
 
 	if (!adding)
 		adding = ft_strdup("(null)", 0);
-	output = malloc(sizeof(char) * ft_strlen(last_string)
-			+ ft_strlen(adding) + 1);
-	ft_strlcpy(output, last_string, position + 1);
-	ft_strlcat(output, adding, ft_strlen(output)+ft_strlen(adding)+1);
-	ft_strlcat(output, last_string + position,
-		ft_strlen(last_string)+ft_strlen(adding) + 1);
-	return (free(last_string), output);
+	write(1,*last_string, pos);
+	output = ft_strdup((*last_string + pos), 0);
+	free(*last_string);
+	*last_string = output;
+	if (isc == 2)
+		write(1, "\0", 1);
+	write(1, adding, ft_strlen(adding));
+	if (isc == 1)
+		write(1, "\0", 1);
+	return (ft_strlen(adding) + pos + !!isc);
 }
 
 //this function will take a string and return a case from it
@@ -108,24 +111,31 @@ int	ft_fill_data(const char *str, t_node *nodes, char **last_sring)
 	return (output);
 }
 
-void	ft_fill_params(int n_of_pars, t_node **nodes, char **l_s, va_list args)
+int	ft_fill_params(int n_of_pars, t_node **nodes, char **l_s, va_list args)
 {
 	int		i;
 	int		add;
 	t_node	*for_storing;
+	int		ret;
 
-	add = 0;
-	i = 0;
+	add = ((i = 0, ret = 0), 0);
 	while (i < n_of_pars)
 	{
 		for_storing = ft_get_node_by_id(nodes, i);
 		if (for_storing->data->specifier != '%')
 			for_storing->data->o_value = va_arg(args, void *);
 		fill_final_value(for_storing);
-		*l_s = add_it_to_last_string(*l_s,
+		ret += add_it_to_last_string(l_s,
 				for_storing->data->final_value,
-				for_storing->data->position + add);
-		add += ft_strlen(for_storing->data->final_value);
+				for_storing->data->position - add,
+				(for_storing->data->specifier == 'c'
+					&& !for_storing->data->o_value)
+				+ ((int)ft_strchr(for_storing->data->flags, '-')
+					&& (for_storing->data->specifier == 'c'
+						&& !for_storing->data->o_value)));
+		add = for_storing->data->position;
 		i++;
 	}
+	write(1, *l_s, ft_strlen(*l_s));
+	return (ret);
 }

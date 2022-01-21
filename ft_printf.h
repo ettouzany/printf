@@ -19,10 +19,10 @@
 
 int		ft_add_case(t_node	*nodes, t_case *acase);
 void	fill_final_value(t_node *t_node);
-char	*add_it_to_last_string(char *last_string, char *adding, int position);
+int		add_it_to_last_string(char **last_s, char *adding, int pos, int isc);
 t_case	*create_case_from_string(char *str, int place);
 int		ft_fill_data(const char *str, t_node *nodes, char **last_sring);
-void	ft_fill_params(int n_of_pars, t_node **nodes, char **l_s, va_list args);
+int		ft_fill_params(int n_of_pars, t_node **nodes, char **l_s, va_list args);
 int		ft_printf(const char *str, ...);
 
 #endif

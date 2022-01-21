@@ -12,6 +12,7 @@
 
 #ifndef FT_PRINTF_OUTILS_H
 # define FT_PRINTF_OUTILS_H
+
 # include <string.h>
 # include <unistd.h>
 # include <stdlib.h>
@@ -55,13 +56,13 @@ int		ft_add_case(t_node	*nodes, t_case *acase);
 
 char	*ft_strjoinl(char *s1, char *s2, int lenght, int fre);
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize);
-size_t	ft_strlen(const char *s);
+int		ft_strlen(const char *s);
 char	*ft_strdup(char *s1, int fre);
 char	*ft_substr(char *s, unsigned int start, size_t len, int fre);
 int		ft_atoi(const char *str);
 size_t	ft_strlcat(char *dest, const char *src, size_t n);
 char	*ft_strjoin(char *s1, char *s2, int fre);
 char	*ft_strchr(const char *str, int c);
-void	ft_putstr(char *s);
 char	*ft_itoa(long n);
+
 #endif

@@ -20,7 +20,7 @@ char	*ft_strdup(char *s1, int fre)
 	i = 0;
 	while (s1[i])
 		i++;
-	output = (char *)malloc(i + 1);
+	output = (char *)malloc(sizeof(char) *(i + 1));
 	if (!output)
 	{
 		return (NULL);

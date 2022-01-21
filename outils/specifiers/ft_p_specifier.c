@@ -17,6 +17,8 @@ char	*ft_p_specifier(void *p, char *flags, int width)
 	char	*output;
 
 	output = ft_short_hexa_converter(p, 0, 4);
+	if (!p && (int)ft_strchr(flags, '.'))
+		output[0] = '\0';
 	if (ft_strchr(flags, '0'))
 		while ((int)ft_strlen(output) < width - 2)
 			output = ft_strjoin("0", output, 2);
